@@ -24,6 +24,8 @@ jobs:
           
       - name: Build Theme
         run: |
+          mkdir -p content.ta && mkdir -p content.ta/books
+          cp -R -u -p content.en/books/** content.ta/books/
           git clone ${{ secrets.GURUKULAM_THEME_REPO }}
           rm -rf gurukulam/site/content.* && rm -rf gurukulam/site/static/ && rm -rf gurukulam/site/layouts/index.html
           BOOK_PATH=$(git config --get remote.origin.url | cut -d. -f2 | cut -c 5-)
