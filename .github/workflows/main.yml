@@ -1,0 +1,49 @@
+# Sample workflow for building and deploying a Hugo site to GitHub Pages
+name: Development Build
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        hugo-version:
+          - 'latest'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: ${{ matrix.hugo-version }}
+          extended: true
+          
+      - name: Build Theme
+        run: |
+          git clone ${{ secrets.GURUKULAM_THEME_REPO }}
+          rm -rf gurukulam/site/content.* && rm -rf gurukulam/site/static/ && rm -rf gurukulam/site/layouts/index.html
+          BOOK_PATH=$(git config --get remote.origin.url | cut -d. -f2 | cut -c 5-)
+          for dir in content.*/; do mkdir -p temp/books/$BOOK_PATH && mv $dir/** temp/books/$BOOK_PATH && mv temp/** $dir/; done
+          cp -rf content.* gurukulam/site/
+          export BUILD_PRODUCTION=Y
+      - name: Run Hugo
+        working-directory: gurukulam/site
+        run: env BUILD_PRODUCTION="Y" hugo --themesDir ../..
+ 
+      - name: Build Theme
+        run: |
+          rm -rf gurukulam/site/public/*.* && rm -rf gurukulam/site/public/tags && rm -rf gurukulam/site/public/en
+          ls gurukulam/site/public
+      - name: Deploy
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          source: "gurukulam/site/public"
+          target: ${{ secrets.TARGET_DIR }}
+          strip_components: 3
