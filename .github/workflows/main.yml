@@ -6,10 +6,10 @@ on:
 
 jobs:
   call-workflow-passing-data:
-    uses: techatpark/gurukulam/.github/workflows/material-deploy.yml@develop
+    uses: gurukulams/gurukulam/.github/workflows/material-deploy.yml@develop
     secrets:
       HOST: ${{ secrets.HOST }}
       USERNAME: ${{ secrets.USERNAME }}
-      PASSWORD: ${{ secrets.PASSWORD }}
+      KEY: ${{ secrets.KEY }}
       TARGET_DIR: ${{ secrets.TARGET_DIR }}
       QUESTIONS_DIR: ${{ secrets.QUESTIONS_DIR }}
